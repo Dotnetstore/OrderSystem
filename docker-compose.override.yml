@@ -1,0 +1,15 @@
+﻿services:
+  rabbitmq:
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  api:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    ports:
+      - "8080:8080"
+
+  dashboard:
+    ports:
+      - "8081:80"

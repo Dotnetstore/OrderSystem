@@ -1,0 +1,21 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/OrderSystem.Api/OrderSystem.Api.csproj" />
+    <Project Path="src/OrderSystem.Application/OrderSystem.Application.csproj" />
+    <Project Path="src/OrderSystem.Dashboard/OrderSystem.Dashboard.csproj" />
+    <Project Path="src/OrderSystem.Domain/OrderSystem.Domain.csproj" />
+    <Project Path="src/OrderSystem.Infrastructure/OrderSystem.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/OrderSystem.Workers/">
+    <Project Path="src/OrderSystem.Workers/OrderSystem.Worker.Audit/OrderSystem.Worker.Audit.csproj" />
+    <Project Path="src/OrderSystem.Workers/OrderSystem.Worker.Notifier/OrderSystem.Worker.Notifier.csproj" />
+    <Project Path="src/OrderSystem.Workers/OrderSystem.Worker.Processor/OrderSystem.Worker.Processor.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/OrderSystem.Tests/OrderSystem.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,119 @@
+﻿@page "/orders"
+
+@implements IDisposable
+@inject HttpClient Http
+
+<h1>Orders Dashboard</h1>
+
+@if (_orders is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Customer</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var o in _orders)
+            {
+                <tr>
+                    <td>@o.Id</td>
+                    <td>@o.Customer</td>
+                    <td>@o.Amount</td>
+                    <td>
+                        <span class="@StatusClass(o.Status)">
+                            @o.Status
+                        </span>
+                    </td>
+                    <td>@o.CreatedAt.ToLocalTime()</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" @onclick="() => LoadAudit(o.Id)">
+                            Audit
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (_auditLog is not null)
+{
+    <h3>Audit Log</h3>
+    <ul>
+        @foreach (var entry in _auditLog)
+        {
+            <li>@entry.Timestamp.ToLocalTime(): @entry.Message</li>
+        }
+    </ul>
+}
+
+@code {
+    private readonly CancellationTokenSource _refreshLoopCancellation = new();
+    private List<OrderDto>? _orders;
+    private List<AuditEntryDto>? _auditLog;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadOrders();
+        _ = ScheduleRefreshAsync();
+    }
+
+    private async Task ScheduleRefreshAsync()
+    {
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(2), _refreshLoopCancellation.Token);
+
+            if (_refreshLoopCancellation.IsCancellationRequested)
+            {
+                return;
+            }
+
+            await LoadOrders();
+            await InvokeAsync(StateHasChanged);
+            _ = ScheduleRefreshAsync();
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private async Task LoadOrders()
+    {
+        _orders = await Http.GetFromJsonAsync<List<OrderDto>>("/api/orders");
+    }
+
+    private async Task LoadAudit(Guid id)
+    {
+        _auditLog = await Http.GetFromJsonAsync<List<AuditEntryDto>>($"/api/orders/{id}/audit");
+    }
+
+    public void Dispose()
+    {
+        _refreshLoopCancellation.Cancel();
+        _refreshLoopCancellation.Dispose();
+    }
+
+    private string StatusClass(string status) =>
+        status switch
+        {
+            "Created" => "badge bg-secondary",
+            "Processing" => "badge bg-warning",
+            "Completed" => "badge bg-success",
+            "Cancelled" => "badge bg-danger",
+            _ => "badge bg-dark"
+        };
+
+    public record OrderDto(Guid Id, string Customer, decimal Amount, string Status, DateTime CreatedAt);
+    public record AuditEntryDto(DateTime Timestamp, string Message);
+}

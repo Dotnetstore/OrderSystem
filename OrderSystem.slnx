@@ -10,6 +10,7 @@
     <File Path="docker-compose.yml" />
     <File Path="LICENSE" />
     <File Path="README.Docker.md" />
+    <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/OrderSystem.Api/OrderSystem.Api.csproj" />
